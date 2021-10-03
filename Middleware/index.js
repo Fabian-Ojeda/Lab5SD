@@ -31,7 +31,6 @@ var ip_host_id = 200
 var id = 0;
 var ip_leader = '192.168.1.200'
 var lastPriority = 10
-var ips_conected = []
 
 function generateInstanceNetwork() {
     let ip = "192.168.1.";
@@ -85,14 +84,14 @@ app.post('/newInstance', (req, res) => {
 })
 
 app.get('/getIpLeader', (req, res) => {
-    if (alreayLeader){
-        res.send('ipLeader')
-    }else{
-        ips_conected.push({ip:ip_leader,priority:lastPriority})
-        var toSend= {ipLeader:'0', priority: lastPriority, conected: }
-        res.send();
+    if (alreayLeader){        
+        res.send([ip_leader, lastPriority])
+        lastPriority--
+    }else{                
+        alreayLeader = true
+        lastPriority--
+        res.send([0]);
     }
-    res.send('el lider es tal')
 })
 
 app.listen(port, () => {
