@@ -23,13 +23,12 @@ app.use(cors(
     config.application.cors.server
 ));
 
-
 app.use("/static", express.static("static"));
 
 var alreayLeader = false
 var ip_host_id = 200
 var id = 0;
-var ip_leader = '192.168.1.200'
+var ip_leader = '192.168.1.38'
 var lastPriority = 10
 
 function generateInstanceNetwork() {
@@ -83,7 +82,8 @@ app.post('/newInstance', (req, res) => {
     console.log("nueva instancia, es copiar y pegar lo de crear nueva instancia")
 })
 
-app.get('/getIpLeader', (req, res) => {
+app.get('/getIpLeader', (req, res) => {    
+    
     if (alreayLeader){        
         res.send([ip_leader, lastPriority])
         lastPriority--
