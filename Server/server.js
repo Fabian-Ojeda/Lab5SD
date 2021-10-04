@@ -1,12 +1,52 @@
-const express = require('express')
+const express = require('express');
+const cors = require('cors');
 const axios = require('axios');
 const app = express()
-const port = 4001
+const http = require('http');
+const server = http.createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+  },
+});
+app.use("/static", express.static("static"));
+const port = 4000
+const config = {
+  application: {
+      cors: {
+          server: [
+              {
+                  origin: ('*'),
+                  credentials: true
+              }
+          ]
+      }
+  },
+
+}
+
+app.use(cors(
+  config.application.cors.server
+));
+
+app.use(express.json());
+
+
+io.on('connection', (socket) => {
+  
+  /*io.emit('spam', arrayIdsHours);
+  socket.on("spam", (data) => {    
+    refreshClientsHours(socket.id, data)
+  });*/
+});
 
 var ipLider = ""
 var myPriority = 0
 var ipsConected = []
 
+/*var eventConsultHour = setInterval(function () {
+  io.emit('spam', 'mensaje del servidor');
+}, 1000)*/
 
 app.get('/', (req, res) => {
   res.send('Resulta que el lider es'+ ipLider+ "y mi prioridad es: "+myPriority)
@@ -18,10 +58,14 @@ function  solicitarLider(){
   axios.get('http://localhost:2000/getIpLeader')
   .then(function (response) {
       if(response.data[0]==0){
+            console.log('soy lider')
+            io.emit('spam', 'Soy el lider');
             ipLider = 'yo'
-      }else{        
+      }else{                
         ipLider = response.data[0]
         myPriority = response.data[1]
+        io.emit('spam', ('Este es lider: '+ipLider));
+        io.emit('spam', ('Esta es mi prioridad: '+myPriority));
         conectToleader()
       }    
   })
@@ -37,6 +81,7 @@ function conectToleader(){
         priority: myPriority
       })
       .then(function (response) {
+        //Aqui vendria la respuesta de las ips conectadas en el medio
         console.log(response);
       })
       .catch(function (error) {
@@ -64,6 +109,16 @@ function broadCastNewConected(ipIn, priorityIn){
     console.log(ipsConected)
 }
 
+function monitoringLeader(){
+  /*setInterval(() => {
+    
+  }, interval);*/
+}
+
+app.get('/view', (req, res) => {
+  res.sendFile(__dirname + '/index.html')
+})
+
 app.post('/myFirstConection', (req, res) => {    
     var ipIn = req.header('x-forwarded-for') || req.socket.remoteAddress;     
     var divisiones = ipIn.split(":", 4);
@@ -79,8 +134,10 @@ app.post('/setNewAmiguito', (req, res) => {
      console.log("soy servidor normal y mire mi lista: "+ipsConected)
 })
 
-app.listen(port, () => {
-  console.log('Example app listening at http://localhost:${port}')
-})
+server.listen(port, () => {
+  console.log('listening on *:4000');
+});
 
-solicitarLider()
+setTimeout(function(){
+  solicitarLider()
+},5000);
