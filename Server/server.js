@@ -144,7 +144,7 @@ function initElections(){
 
 app.post('/tristeza', (req, res) => {    
   clearInterval(cosa)
-  io.emit('spam', ('Dejamos de comunicarnos con el lider, el ider se va a hacer tapiar'));
+  io.emit('spam', ('Dejamos de comunicarnos con el lider, el lider se va a hacer tapiar'));
 })
 
 app.get('/status', (req, res) => {
