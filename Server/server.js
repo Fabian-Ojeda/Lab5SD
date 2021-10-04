@@ -136,7 +136,7 @@ function monitoringLeader(){
   }, 2000);
 }
 
-function initElections(){
+async function initElections(){
   
   var contested = await doElections()
 
