@@ -43,7 +43,7 @@ io.on('connection', (socket) => {
 var ipLider = ""
 var myPriority = 0
 var ipsConected = []
-
+var st = ''
 /*var eventConsultHour = setInterval(function () {
   io.emit('spam', 'mensaje del servidor');
 }, 1000)*/
@@ -118,18 +118,18 @@ function monitoringLeader(){
           })
           .then(function (response) {
             console.log(response.status);
-            var st = ''
+            
             if(response.status==200){
               st= 'El servidor esta una berraquera practicamente pues, pues, pues, pues'
               io.emit('spam', st);
             }else{
-              st= 'El servidor se hizo coger tristeza'
-              io.emit('spam', st);
-              initElections()
+              
             }
           })
           .catch(function (error) {
-            console.log(error);
+            st= 'El servidor se hizo coger tristeza'
+            io.emit('spam', st);
+            initElections()
           });
   }, 2000);
 }
