@@ -136,11 +136,9 @@ function monitoringLeader(){
   },(myPriority*1000));
 }
 
-function initElections(){
+async function initElections(){
   var contested = false
-  setTimeout(function(){
-    contested = doElections()
-  },5000);  
+  contested = await doElections()
 
   if (contested){
     st= 'Alguien se va a encargar de eso';
@@ -153,7 +151,7 @@ function initElections(){
 
 }
 
-function doElections(){
+async function doElections(){
   var contested = false
   ipsConected.forEach(element => {
     axios.post('http://'+element.ip+":4000/tristeza")
