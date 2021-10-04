@@ -33,21 +33,14 @@ app.use(express.json());
 
 
 io.on('connection', (socket) => {
-  
-  /*io.emit('spam', arrayIdsHours);
-  socket.on("spam", (data) => {    
-    refreshClientsHours(socket.id, data)
-  });*/
+    
 });
 
 var ipLider = ""
 var myPriority = 0
 var ipsConected = []
 var st = ''
-var cosa
-/*var eventConsultHour = setInterval(function () {
-  io.emit('spam', 'mensaje del servidor');
-}, 1000)*/
+var heartbit
 
 app.get('/', (req, res) => {
   res.send('Resulta que el lider es'+ ipLider+ " y mi prioridad es: "+myPriority)
@@ -55,7 +48,7 @@ app.get('/', (req, res) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
-function  solicitarLider(){
+function getLeader(){
   axios.get('http://192.168.1.38:2000/getIpLeader')
   .then(function (response) {
       if(response.data[0]==0){
@@ -65,7 +58,7 @@ function  solicitarLider(){
       }else{                
         ipLider = response.data[0]
         myPriority = response.data[1]
-        io.emit('spam', ('Este es lider: '+ipLider));
+        io.emit('spam', ('Este es el lider: '+ipLider));
         io.emit('spam', ('Esta es mi prioridad: '+myPriority));
         conectToleader()
       }    
@@ -96,7 +89,7 @@ function conectToleader(){
 
 function broadCastNewConected(ipIn, priorityIn){
     ipsConected.forEach(element => {
-        axios.post('http://'+element.ip+':4000/setNewAmiguito', {
+        axios.post('http://'+element.ip+':4000/newhost', {
             ip:ipIn,            
             priority: priorityIn
           })
@@ -113,7 +106,7 @@ function broadCastNewConected(ipIn, priorityIn){
 }
 
 function monitoringLeader(){
-  cosa = setInterval(() => {
+  heartbit = setInterval(() => {
     axios.get('http://'+ipLider+':4000/status', {
             
           })
@@ -121,16 +114,16 @@ function monitoringLeader(){
             console.log(response.status);
             
             if(response.status==200){
-              st= 'El servidor esta una berraquera practicamente pues, pues, pues, pues'
+              st= 'El lider esta funcionando'
               io.emit('spam', st);
             }else{
               
             }
           })
           .catch(function (error) {
-            st= 'El servidor se hizo coger tristeza'
+            st= 'El lider ha caido'
             io.emit('spam', st);
-            clearInterval(cosa)
+            clearInterval(heartbit)
             initElections()            
           });
   },(myPriority*1000));
@@ -154,7 +147,7 @@ async function initElections(){
 async function doElections(){
   var contested = false
   ipsConected.forEach(element => {
-    axios.post('http://'+element.ip+":4000/tristeza")
+    axios.post('http://'+element.ip+":4000/down")
   });
 
   ipsConected.forEach(element => {
@@ -166,9 +159,9 @@ async function doElections(){
         console.log(response.status);
         
         if(response.status==200){
+          contested = true;
           st= 'El servidor '+element.ip+' se va a encargar de seleccionar';
-          io.emit('spam', st);
-          contested = true
+          io.emit('spam', st);          
         }
       })
       .catch(function (error) {
@@ -185,7 +178,7 @@ function updateLeader(){
   ipsConected.forEach(element => {
     axios.post('http://'+element.ip+':4000/newLeader')
   });
-  axios.post('http://192.168.1.38:4000/newLeader')
+  axios.post('http://192.168.1.38:2000/newLeader')
 }
 
 app.post('/newLeader', (req, res) => {    
@@ -203,8 +196,8 @@ app.post('/YouChoose', (req, res) => {
 })
 
 
-app.post('/tristeza', (req, res) => {    
-  clearInterval(cosa)
+app.post('/down', (req, res) => {    
+  clearInterval(heartbit)
   io.emit('spam', ('Dejamos de comunicarnos con el lider, el lider se va a hacer tapiar'));
 })
 
@@ -221,14 +214,13 @@ app.post('/myFirstConection', (req, res) => {
     var divisiones = ipIn.split(":", 4);
     ipIn=divisiones[3]
     console.log(ipIn);
-    console.log("pillese la prioridad: "+req.body.priority)
     res.send(ipsConected)
     broadCastNewConected(ipIn, req.body.priority)    
 })
 
-app.post('/setNewAmiguito', (req, res) => {    
+app.post('/newhost', (req, res) => {    
      ipsConected.push({ip:req.body.ip, priority: req.body.priority})
-     io.emit('spam', ("Me informan que el servidor: "+JSON.stringify(ipsConected)+" se ha unido"));
+     io.emit('spam', ("Me informan que el servidor: "+req.body.ip+" se ha unido, tiene de prioridad: "+req.body.priority));
 })
 
 server.listen(port, () => {
@@ -236,5 +228,5 @@ server.listen(port, () => {
 });
 
 setTimeout(function(){
-  solicitarLider()
+  getLeader()
 },5000);
