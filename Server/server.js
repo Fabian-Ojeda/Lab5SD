@@ -82,12 +82,13 @@ function conectToleader(){
       })
       .then(function (response) {
         //Aqui vendria la respuesta de las ips conectadas en el medio
-        io.emit('spam', 'Esta es la lista de conectados: '+response);
-        console.log(response);
+        io.emit('spam', 'Esta es la lista de conectados: '+response.data);
+        ipsConected = response.data
       })
       .catch(function (error) {
         console.log(error);
-      });    
+      });
+      monitoringLeader() 
 }
 
 
@@ -111,10 +112,35 @@ function broadCastNewConected(ipIn, priorityIn){
 }
 
 function monitoringLeader(){
-  /*setInterval(() => {
-    
-  }, interval);*/
+  setInterval(() => {
+    axios.get('http://'+ipLider+':4000/status', {
+            
+          })
+          .then(function (response) {
+            console.log(response.status);
+            var st = ''
+            if(response.status==200){
+              st= 'El servidor esta una berraquera practicamente pues, pues, pues, pues'
+              io.emit('spam', st);
+            }else{
+              st= 'El servidor se hizo coger tristeza'
+              io.emit('spam', st);
+              initElections()
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+  }, 2000);
 }
+
+function initElections(){
+
+}
+
+app.get('/status', (req, res) => {
+  res.sendStatus(200)
+})
 
 app.get('/view', (req, res) => {
   res.sendFile(__dirname + '/index.html')
