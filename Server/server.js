@@ -44,6 +44,7 @@ var ipLider = ""
 var myPriority = 0
 var ipsConected = []
 var st = ''
+var cosa
 /*var eventConsultHour = setInterval(function () {
   io.emit('spam', 'mensaje del servidor');
 }, 1000)*/
@@ -112,7 +113,7 @@ function broadCastNewConected(ipIn, priorityIn){
 }
 
 function monitoringLeader(){
-  var cosa = setInterval(() => {
+  cosa = setInterval(() => {
     axios.get('http://'+ipLider+':4000/status', {
             
           })
@@ -129,15 +130,22 @@ function monitoringLeader(){
           .catch(function (error) {
             st= 'El servidor se hizo coger tristeza'
             io.emit('spam', st);
-            initElections()
             clearInterval(cosa)
+            initElections()            
           });
   }, 2000);
 }
 
 function initElections(){
-
+  ipsConected.forEach(element => {
+    axios.post('http://'+element.ip+":4000/tristeza")
+  });
 }
+
+app.post('/tristeza', (req, res) => {    
+  clearInterval(cosa)
+  io.emit('spam', ('Dejamos de comunicarnos con el lider, el ider se va a hacer tapiar'));
+})
 
 app.get('/status', (req, res) => {
   res.sendStatus(200)
