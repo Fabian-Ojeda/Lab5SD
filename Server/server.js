@@ -41,6 +41,7 @@ var myPriority = 0
 var ipsConected = []
 var st = ''
 var heartbit
+var contested = false
 
 app.get('/', (req, res) => {
   res.send('Resulta que el lider es'+ ipLider+ " y mi prioridad es: "+myPriority)
@@ -116,8 +117,6 @@ function monitoringLeader(){
             if(response.status==200){
               st= 'El lider esta funcionando'
               io.emit('spam', st);
-            }else{
-              
             }
           })
           .catch(function (error) {
@@ -130,8 +129,8 @@ function monitoringLeader(){
 }
 
 async function initElections(){
-  var contested = false
-  contested = await doElections()
+  contested = false
+  await stopMonitoring()  
 
   if (contested){
     st= 'Alguien se va a encargar de eso';
@@ -144,12 +143,14 @@ async function initElections(){
 
 }
 
-async function doElections(){
-  var contested = false
+async function stopMonitoring(){
   ipsConected.forEach(element => {
     axios.post('http://'+element.ip+":4000/down")
   });
+  await doElections()
+}
 
+async function doElections(){
   ipsConected.forEach(element => {
 
     if (element.priority>myPriority){
@@ -169,9 +170,7 @@ async function doElections(){
         io.emit('spam', st);
       });
     }
-
   })
-  return contested
 }
 
 function updateLeader(){
@@ -196,9 +195,12 @@ app.post('/YouChoose', (req, res) => {
 })
 
 
-app.post('/down', (req, res) => {    
+app.post('/down', (req, res) => { 
+  var ipIn = req.header('x-forwarded-for') || req.socket.remoteAddress;     
+  var divisiones = ipIn.split(":", 4);
+  ipIn=divisiones[3]   
   clearInterval(heartbit)
-  io.emit('spam', ('Dejamos de comunicarnos con el lider, el lider se va a hacer tapiar'));
+  io.emit('spam', ('El servidor '+ipIn+' nos dice que debemos dejar de hacer latidos al lider'));
 })
 
 app.get('/status', (req, res) => {
