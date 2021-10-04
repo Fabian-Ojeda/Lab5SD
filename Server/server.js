@@ -55,7 +55,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 
 function  solicitarLider(){
-  axios.get('http://localhost:2000/getIpLeader')
+  axios.get('http://192.168.1.38:2000/getIpLeader')
   .then(function (response) {
       if(response.data[0]==0){
             console.log('soy lider')
