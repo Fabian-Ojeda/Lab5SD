@@ -112,7 +112,7 @@ function broadCastNewConected(ipIn, priorityIn){
 }
 
 function monitoringLeader(){
-  setInterval(() => {
+  var cosa = setInterval(() => {
     axios.get('http://'+ipLider+':4000/status', {
             
           })
@@ -130,6 +130,7 @@ function monitoringLeader(){
             st= 'El servidor se hizo coger tristeza'
             io.emit('spam', st);
             initElections()
+            clearInterval(cosa)
           });
   }, 2000);
 }
