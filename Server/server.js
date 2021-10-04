@@ -166,8 +166,24 @@ function initElections(){
   }else{
     st= 'Yo soy el lider';
     io.emit('spam', st);
+    updateLeader()
   }
 }
+
+function updateLeader(){
+  ipsConected.forEach(element => {
+    axios.post('http://'+element.ip+':4000/newLeader')
+  });
+  axios.post('http://192.168.1.38:4000/newLeader')
+}
+
+app.post('/newLeader', (req, res) => {    
+  var ipIn = req.header('x-forwarded-for') || req.socket.remoteAddress;     
+  var divisiones = ipIn.split(":", 4);
+  ipIn=divisiones[3]
+  ipLider=ipIn
+  monitoringLeader()
+})
 
 app.post('/YouChoose', (req, res) => {    
   res.sendStatus(200)

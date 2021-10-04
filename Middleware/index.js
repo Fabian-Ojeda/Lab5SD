@@ -97,6 +97,12 @@ app.get('/getIpLeader', (req, res) => {
         res.send([0]);
     }
 })
+app.post('/newLeader', (req, res) => {    
+    var ipIn = req.header('x-forwarded-for') || req.socket.remoteAddress;     
+    var divisiones = ipIn.split(":", 4);
+    ipIn=divisiones[3]
+    ip_leader=ipIn
+  })
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)

@@ -1,6 +1,6 @@
 const socket = io("/");
 
 socket.on("spam", (data) => {
-    document.getElementById('info').innerHTML += `${data}`
+    document.getElementById('info').innerHTML += `${data}<br>`
 
 });
