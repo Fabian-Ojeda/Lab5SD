@@ -83,7 +83,7 @@ function conectToleader(){
       })
       .then(function (response) {
         //Aqui vendria la respuesta de las ips conectadas en el medio
-        io.emit('spam', 'Esta es la lista de conectados: '+response.data);
+        io.emit('spam', 'Esta es la lista de conectados: '+JSON.stringify(response.data));
         ipsConected = response.data
       })
       .catch(function (error) {
