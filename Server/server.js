@@ -133,7 +133,7 @@ function monitoringLeader(){
             clearInterval(cosa)
             initElections()            
           });
-  }, 2000);
+  },(myPriority*1000));
 }
 
 function initElections(){
