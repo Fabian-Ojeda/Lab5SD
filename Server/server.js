@@ -49,7 +49,7 @@ var ipsConected = []
 }, 1000)*/
 
 app.get('/', (req, res) => {
-  res.send('Resulta que el lider es'+ ipLider+ "y mi prioridad es: "+myPriority)
+  res.send('Resulta que el lider es'+ ipLider+ " y mi prioridad es: "+myPriority)
 })
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
@@ -82,6 +82,7 @@ function conectToleader(){
       })
       .then(function (response) {
         //Aqui vendria la respuesta de las ips conectadas en el medio
+        io.emit('spam', 'Esta es la lista de conectados: '+response);
         console.log(response);
       })
       .catch(function (error) {
@@ -105,7 +106,7 @@ function broadCastNewConected(ipIn, priorityIn){
           });
     });
     //se agrega despues para que no se monitoree a ella misma
-    ipsConected.push({ip:ipIn, priority: priorityIN})
+    ipsConected.push({ip:ipIn, priority: priorityIn})
     console.log(ipsConected)
 }
 

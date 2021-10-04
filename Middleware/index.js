@@ -87,7 +87,11 @@ app.get('/getIpLeader', (req, res) => {
     if (alreayLeader){        
         res.send([ip_leader, lastPriority])
         lastPriority--
-    }else{                
+    }else{ 
+        var ipIn = req.header('x-forwarded-for') || req.socket.remoteAddress;     
+        var divisiones = ipIn.split(":", 4);
+        ipIn=divisiones[3] 
+        ip_leader=ipIn              
         alreayLeader = true
         lastPriority--
         res.send([0]);
