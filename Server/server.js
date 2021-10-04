@@ -137,11 +137,28 @@ function monitoringLeader(){
 }
 
 function initElections(){
+  
+  var contested = await doElections()
+
+  if (contested){
+    st= 'Alguien se va a encargar de eso';
+    io.emit('spam', st);
+  }else{
+    st= 'Yo soy el lider';
+    io.emit('spam', st);
+    updateLeader()
+  }
+
+}
+
+async function doElections(){
   var contested = false
   ipsConected.forEach(element => {
     axios.post('http://'+element.ip+":4000/tristeza")
   });
+
   ipsConected.forEach(element => {
+
     if (element.priority>myPriority){
       axios.post('http://'+element.ip+":4000/YouChoose", {            
       })
@@ -159,15 +176,9 @@ function initElections(){
         io.emit('spam', st);
       });
     }
-  });
-  if (contested){
-    st= 'Alguien se va a encargar de eso';
-    io.emit('spam', st);
-  }else{
-    st= 'Yo soy el lider';
-    io.emit('spam', st);
-    updateLeader()
-  }
+
+  })
+  return contested
 }
 
 function updateLeader(){
@@ -182,6 +193,7 @@ app.post('/newLeader', (req, res) => {
   var divisiones = ipIn.split(":", 4);
   ipIn=divisiones[3]
   ipLider=ipIn
+  io.emit('spam', ("El nuevo lider es: "+ipLider));
   monitoringLeader()
 })
 
@@ -216,7 +228,7 @@ app.post('/myFirstConection', (req, res) => {
 
 app.post('/setNewAmiguito', (req, res) => {    
      ipsConected.push({ip:req.body.ip, priority: req.body.priority})
-     io.emit('spam', ("soy servidor normal y mire mi lista: "+JSON.stringify(ipsConected)));
+     io.emit('spam', ("Me informan que el servidor: "+JSON.stringify(ipsConected)+" se ha unido"));
 })
 
 server.listen(port, () => {
