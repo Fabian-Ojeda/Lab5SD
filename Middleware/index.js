@@ -59,7 +59,7 @@ function createVM(ip, id) {
             "\n cd Server" +
             "\n sudo npm i" +
             "\n sudo npm i -g pm2" +
-            "\n pm2 start index.js" +
+            "\n pm2 start server.js" +
             "\nSHELL" +
             "\nend",
             function (err) {

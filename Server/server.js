@@ -40,7 +40,7 @@ var ipLider = ""
 var myPriority = 0
 var ipsConected = []
 var st = ''
-var heartbit
+var beat
 var contested = false
 
 app.get('/', (req, res) => {
@@ -120,8 +120,8 @@ function monitoringLeader(){
           .catch(function (error) {
             st= 'El lider ha caido'
             io.emit('spam', st);
-            clearInterval(beat)
-            initElections()            
+            initElections()   
+            clearInterval(beat)         
           });
   },(myPriority*1000));
 }
@@ -136,7 +136,7 @@ async function initElections(){
   }else{
     st= 'Yo soy el lider';
     io.emit('spam', st);
-    updateLeader()
+    await updateLeader()
   }
 
 }
@@ -170,11 +170,26 @@ async function doElections(){
   })
 }
 
-function updateLeader(){
+async function updateLeader(){
   ipsConected.forEach(element => {
     axios.post('http://'+element.ip+':4000/newLeader')
   });
   axios.post('http://192.168.1.38:2000/newLeader')
+}
+
+function deleteLeaderForList(ip){
+  ipsConected.forEach(element => {
+    if(element.ip == ip){
+        removeItemFromArr(ipsConected, element)
+    }
+  });
+}
+
+function removeItemFromArr ( arr, item ) {
+  var i = arr.indexOf( item );
+  if ( i !== -1 ) {
+      arr.splice( i, 1 );
+  }
 }
 
 app.post('/newLeader', (req, res) => {    
@@ -182,6 +197,7 @@ app.post('/newLeader', (req, res) => {
   var divisiones = ipIn.split(":", 4);
   ipIn=divisiones[3]
   ipLider=ipIn
+  deleteLeaderForList(ipLider)
   io.emit('spam', ("El nuevo lider es: "+ipLider));
   monitoringLeader()
 })
@@ -195,8 +211,8 @@ app.post('/YouChoose', (req, res) => {
 app.post('/down', (req, res) => { 
   var ipIn = req.header('x-forwarded-for') || req.socket.remoteAddress;     
   var divisiones = ipIn.split(":", 4);
-  ipIn=divisiones[3]   
-  clearInterval(heartbit)
+  ipIn=divisiones[3]  
+  clearInterval(beat)
   io.emit('spam', ('El servidor '+ipIn+' nos dice que debemos dejar de hacer latidos al lider'));
 })
 
@@ -213,6 +229,7 @@ app.post('/myFirstConection', (req, res) => {
     var divisiones = ipIn.split(":", 4);
     ipIn=divisiones[3]
     console.log(ipIn);
+    io.emit('spam',("El servidor "+ ipIn+ "Se conecto al esquema"))
     res.send(ipsConected)
     broadCastNewConected(ipIn, req.body.priority)    
 })
