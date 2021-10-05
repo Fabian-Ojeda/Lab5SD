@@ -172,7 +172,7 @@ function doElections(){
   })
 }
 
-function updateLeader(){
+async function updateLeader(){
   ipsConected.forEach(async (element) => {
     await axios.post('http://'+element.ip+':4000/newLeader')
   });
