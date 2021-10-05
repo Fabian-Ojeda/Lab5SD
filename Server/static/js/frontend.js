@@ -11,6 +11,7 @@ socket.on("leader", (data) => {
 });
 
 function stopLeader() {
+    console.log("wenas")
     axios.post('http://localhost:4000/StopLeader').then((result) => {
         alert(result.data);
     })
