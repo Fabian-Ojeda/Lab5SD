@@ -71,8 +71,6 @@ function getLeader(){
   .catch(function (error) {
     console.log(error);
   })
-  .then(function () {
-  });
 }
 
 function conectToleader(){
@@ -149,19 +147,17 @@ async function initElections(){
 
 async function stopMonitoring(){
   ipsConected.forEach(element => {
-    axios.post('http://'+element.ip+":4000/down")
+    await axios.post('http://'+element.ip+":4000/down")
   });
-  await doElections()
+  doElections()
 }
 
-async function doElections(){
+function doElections(){
   ipsConected.forEach(element => {
-
     if (element.priority>myPriority){
       axios.post('http://'+element.ip+":4000/YouChoose")
       .then(function (response) {
         console.log(response.status);
-        
         if(response.status==200){
           contested = true;
           st = 'El servidor '+element.ip+' se va a encargar de seleccionar';
@@ -178,9 +174,9 @@ async function doElections(){
 
 async function updateLeader(){
   ipsConected.forEach(element => {
-    axios.post('http://'+element.ip+':4000/newLeader')
+    await axios.post('http://'+element.ip+':4000/newLeader')
   });
-  axios.post('http://192.168.1.38:2000/newLeader')
+  await axios.post('http://192.168.1.38:2000/newLeader')
 }
 
 function deleteLeaderForList(ip){
@@ -198,9 +194,9 @@ function removeItemFromArr ( arr, item ) {
   }
 }
 
-async function verifyAnotherLeaders(){
+function verifyAnotherLeaders(){
   contested = false
-  await doElections()
+  doElections()
   
   if (contested){
     st= 'Alguien se va a encargar de eso';
@@ -212,7 +208,7 @@ async function verifyAnotherLeaders(){
   }
 }
 
-app.post('/newLeader', (req, res) => {    
+app.post('/newLeader', (req, res, next) => {    
   var ipIn = req.header('x-forwarded-for') || req.socket.remoteAddress;     
   var divisiones = ipIn.split(":", 4);
   ipIn=divisiones[3]
@@ -220,6 +216,7 @@ app.post('/newLeader', (req, res) => {
   deleteLeaderForList(ipLider)
   io.emit('spam', ("El nuevo lider es: "+ipLider));
   monitoringLeader()
+  next()
 })
 
 app.post('/YouChoose', (req, res) => {    
@@ -228,39 +225,43 @@ app.post('/YouChoose', (req, res) => {
 })
 
 
-app.post('/down', (req, res) => { 
+app.post('/down', (req, res, next) => { 
   var ipIn = req.header('x-forwarded-for') || req.socket.remoteAddress;     
   var divisiones = ipIn.split(":", 4);
   ipIn=divisiones[3]  
   clearInterval(beat)
   io.emit('spam', ('El servidor '+ipIn+' nos dice que debemos dejar de hacer latidos al lider'));
+  next();
 })
 
-app.get('/status', (req, res) => {
+app.get('/status', (req, res, next) => {
   res.sendStatus(200)
+  next()
 })
 
 app.get('/view', (req, res) => {
   res.sendFile(__dirname + '/index.html')
 })
 
-app.post('/myFirstConection', (req, res) => {    
+app.post('/myFirstConection', (req, res, next) => {    
     var ipIn = req.header('x-forwarded-for') || req.socket.remoteAddress;     
     var divisiones = ipIn.split(":", 4);
     ipIn=divisiones[3]
     console.log(ipIn);
     io.emit('spam',("El servidor "+ ipIn+ "Se conecto al esquema"))
     res.send(ipsConected)
-    broadCastNewConected(ipIn, req.body.priority)    
+    broadCastNewConected(ipIn, req.body.priority)   
+    next() 
 })
 
+//TODO
 app.post('/newhost', (req, res) => {    
      ipsConected.push({ip:req.body.ip, priority: req.body.priority})
      io.emit('spam', ("Me informan que el servidor: "+req.body.ip+" se ha unido, tiene de prioridad: "+req.body.priority));
 })
 
 app.post('/StopLeader',(req,res)=> {
-    exe
+   // exe
 })
 
 server.listen(port, () => {
