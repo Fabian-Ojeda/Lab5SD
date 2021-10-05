@@ -9,11 +9,13 @@
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "ipware": "^2.0.0",
+    "nodemon": "^2.0.13",
     "static": "^2.0.0"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
   },
   "author": "Fabian",
   "license": "ISC"

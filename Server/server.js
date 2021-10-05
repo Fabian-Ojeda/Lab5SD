@@ -44,7 +44,7 @@ var heartbit
 var contested = false
 
 app.get('/', (req, res) => {
-  res.send('Resulta que el lider es'+ ipLider+ " y mi prioridad es: "+myPriority)
+  res.send({leader: ipLider, priority: myPriority})
 })
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
@@ -107,22 +107,20 @@ function broadCastNewConected(ipIn, priorityIn){
 }
 
 function monitoringLeader(){
-  heartbit = setInterval(() => {
-    axios.get('http://'+ipLider+':4000/status', {
-            
-          })
+  beat = setInterval(() => {
+    axios.get('http://'+ipLider+':4000/status')
           .then(function (response) {
             console.log(response.status);
             
             if(response.status==200){
-              st= 'El lider esta funcionando'
+              st = 'El lider esta funcionando'
               io.emit('spam', st);
             }
           })
           .catch(function (error) {
             st= 'El lider ha caido'
             io.emit('spam', st);
-            clearInterval(heartbit)
+            clearInterval(beat)
             initElections()            
           });
   },(myPriority*1000));
@@ -154,19 +152,18 @@ async function doElections(){
   ipsConected.forEach(element => {
 
     if (element.priority>myPriority){
-      axios.post('http://'+element.ip+":4000/YouChoose", {            
-      })
+      axios.post('http://'+element.ip+":4000/YouChoose")
       .then(function (response) {
         console.log(response.status);
         
         if(response.status==200){
           contested = true;
-          st= 'El servidor '+element.ip+' se va a encargar de seleccionar';
+          st = 'El servidor '+element.ip+' se va a encargar de seleccionar';
           io.emit('spam', st);          
         }
       })
       .catch(function (error) {
-        st= 'El servidor '+element.ip+' Tambien esta caido';
+        st = 'El servidor '+element.ip+' Tambien esta caido';
         io.emit('spam', st);
       });
     }

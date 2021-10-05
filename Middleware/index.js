@@ -54,9 +54,9 @@ function createVM(ip, id) {
             "\n sudo rm app" +
             "\n sudo mkdir app" +
             "\n cd app" +
-            "\n git clone" +
-            "\n cd " +
-            "\n cd " +
+            "\n git clone https://github.com/Fabian-Ojeda/Lab5SD.git" +
+            "\n cd Lab5SD" +
+            "\n cd Server" +
             "\n sudo npm i" +
             "\n sudo npm i -g pm2" +
             "\n pm2 start index.js" +
@@ -66,7 +66,7 @@ function createVM(ip, id) {
                 if (err) {
                     return console.log(err);
                 }
-                console.log("el archivo fue creado correctamente");
+                console.log("VagrantVM is loading...");
             }
         );
     });
@@ -78,8 +78,7 @@ app.get('/', (req, res) => {
 })
 
 app.post('/newInstance', (req, res) => {
-    res.send('ah bueno pa saber')
-    console.log("nueva instancia, es copiar y pegar lo de crear nueva instancia")
+    generateInstanceNetwork()
 })
 
 app.get('/getIpLeader', (req, res) => {    
