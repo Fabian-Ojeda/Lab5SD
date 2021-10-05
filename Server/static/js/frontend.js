@@ -1,11 +1,9 @@
 const socket = io("/");
 
 socket.on("spam", (data) => {
-    if (data = 'Yo soy el lider') {
-        document.getElementById('info').innerHTML += `<center><h1>${data}</h1></center>`
-    } else {
-        document.getElementById('info').innerHTML += `<h6>${data}</h6>`
-    }
+          
+    document.getElementById('info').innerHTML += `<h6>${data}</h6>`
+    
 });
 
 socket.on("leader", (data) => {
