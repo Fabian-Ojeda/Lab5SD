@@ -140,7 +140,7 @@ function initElections(){
     isLeader = true
     io.emit('leader' , isLeader)
     io.emit('spam', st);
-    await updateLeader()
+    updateLeader()
   }
 
 }
@@ -172,8 +172,8 @@ function doElections(){
   })
 }
 
-async function updateLeader(){
-  ipsConected.forEach(element => {
+function updateLeader(){
+  ipsConected.forEach(async (element) => {
     await axios.post('http://'+element.ip+':4000/newLeader')
   });
   await axios.post('http://192.168.1.38:2000/newLeader')
@@ -204,7 +204,7 @@ function verifyAnotherLeaders(){
   }else{
     st= 'Yo soy el lider';
     io.emit('spam', st);
-    await updateLeader()
+    updateLeader()
   }
 }
 
