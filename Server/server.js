@@ -128,9 +128,9 @@ function monitoringLeader(){
   },(myPriority*1000));
 }
 
-async function initElections(){
+function initElections(){
   contested = false
-  await stopMonitoring()  
+  stopMonitoring()  
 
   if (contested){
     st= 'Alguien se va a encargar de eso';
@@ -145,8 +145,8 @@ async function initElections(){
 
 }
 
-async function stopMonitoring(){
-  ipsConected.forEach(element => {
+function stopMonitoring(){
+  ipsConected.forEach(async(element) => {
     await axios.post('http://'+element.ip+":4000/down")
   });
   doElections()
