@@ -112,7 +112,7 @@ function monitoringLeader(){
   beat = setInterval(() => {
     axios.get('http://'+ipLider+':4000/status')
           .then(function (response) {
-            console.log(response.status);
+            console.log(response.status+" "+ipLider);
             
             if(response.status==200){
               st = 'El lider esta funcionando'
@@ -128,7 +128,7 @@ function monitoringLeader(){
   },(myPriority*1000));
 }
 
-function initElections(){
+async function initElections(){
   contested = false
   stopMonitoring()  
 
@@ -140,7 +140,7 @@ function initElections(){
     isLeader = true
     io.emit('leader' , isLeader)
     io.emit('spam', st);
-    updateLeader()
+    await updateLeader()
   }
 
 }
@@ -194,7 +194,7 @@ function removeItemFromArr ( arr, item ) {
   }
 }
 
-function verifyAnotherLeaders(){
+async function verifyAnotherLeaders(){
   contested = false
   doElections()
   
@@ -204,7 +204,7 @@ function verifyAnotherLeaders(){
   }else{
     st= 'Yo soy el lider';
     io.emit('spam', st);
-    updateLeader()
+   await updateLeader()
   }
 }
 
