@@ -261,8 +261,10 @@ app.post('/newhost', (req, res) => {
      io.emit('spam', ("Me informan que el servidor: "+req.body.ip+" se ha unido, tiene de prioridad: "+req.body.priority));
 })
 
-app.post('/StopLeader',(req,res)=> {
-   exec('pm2 stop 0')
+app.post('/StopLeader',(req,res, next)=> {
+  
+  exec('pm2 stop 0')
+  next()
 })
 
 server.listen(port, () => {

@@ -10,9 +10,7 @@ socket.on("leader", (data) => {
     document.getElementById('divButton').style = 'block'
 });
 
-function stopLeader() {
+async function stopLeader() {
     console.log("wenas")
-    axios.post('http://localhost:4000/StopLeader').then((result) => {
-        alert(result.data);
-    })
+    await axios.post('http://localhost:4000/StopLeader')
 }
