@@ -5,6 +5,7 @@ const app = express()
 const http = require('http');
 const { verify } = require('crypto');
 const server = http.createServer(app);
+const exec = require('child-process-async').exec
 const io = require("socket.io")(server, {
   cors: {
     origin: "*",
@@ -55,7 +56,6 @@ function getLeader(){
   axios.get('http://192.168.1.38:2000/getIpLeader')
   .then(function (response) {
       if(response.data[0]==0){
-            console.log('soy lider')
             io.emit('spam', 'Soy el lider');
             ipLider = 'yo'
             isLeader = true
@@ -262,7 +262,7 @@ app.post('/newhost', (req, res) => {
 })
 
 app.post('/StopLeader',(req,res)=> {
-   // exe
+   exec('pm2 stop 0')
 })
 
 server.listen(port, () => {
