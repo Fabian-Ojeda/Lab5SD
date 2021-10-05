@@ -123,12 +123,13 @@ function monitoringLeader(){
             st= 'El lider ha caido'
             io.emit('spam', st);
             initElections()   
-            clearInterval(beat)         
+                     
           });
   },(myPriority*1000));
 }
 
 async function initElections(){
+  clearInterval(beat)
   contested = false
   stopMonitoring()  
 
@@ -196,7 +197,7 @@ function removeItemFromArr ( arr, item ) {
 
 async function verifyAnotherLeaders(){
   contested = false
-  doElections()
+  await doElections()
   
   if (contested){
     st= 'Alguien se va a encargar de eso';
