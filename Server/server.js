@@ -3,6 +3,7 @@ const cors = require('cors');
 const axios = require('axios');
 const app = express()
 const http = require('http');
+const { verify } = require('crypto');
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
   cors: {
@@ -36,6 +37,7 @@ io.on('connection', (socket) => {
     
 });
 
+var isLeader 
 var ipLider = ""
 var myPriority = 0
 var ipsConected = []
@@ -56,6 +58,8 @@ function getLeader(){
             console.log('soy lider')
             io.emit('spam', 'Soy el lider');
             ipLider = 'yo'
+            isLeader = true
+            io.emit('leader' , isLeader)
       }else{                
         ipLider = response.data[0]
         myPriority = response.data[1]
@@ -135,6 +139,8 @@ async function initElections(){
     io.emit('spam', st);
   }else{
     st= 'Yo soy el lider';
+    isLeader = true
+    io.emit('leader' , isLeader)
     io.emit('spam', st);
     await updateLeader()
   }
@@ -192,6 +198,20 @@ function removeItemFromArr ( arr, item ) {
   }
 }
 
+async function verifyAnotherLeaders(){
+  contested = false
+  await doElections()
+  
+  if (contested){
+    st= 'Alguien se va a encargar de eso';
+    io.emit('spam', st);
+  }else{
+    st= 'Yo soy el lider';
+    io.emit('spam', st);
+    await updateLeader()
+  }
+}
+
 app.post('/newLeader', (req, res) => {    
   var ipIn = req.header('x-forwarded-for') || req.socket.remoteAddress;     
   var divisiones = ipIn.split(":", 4);
@@ -204,7 +224,7 @@ app.post('/newLeader', (req, res) => {
 
 app.post('/YouChoose', (req, res) => {    
   res.sendStatus(200)
-  initElections()
+  verifyAnotherLeaders()
 })
 
 
@@ -237,6 +257,10 @@ app.post('/myFirstConection', (req, res) => {
 app.post('/newhost', (req, res) => {    
      ipsConected.push({ip:req.body.ip, priority: req.body.priority})
      io.emit('spam', ("Me informan que el servidor: "+req.body.ip+" se ha unido, tiene de prioridad: "+req.body.priority));
+})
+
+app.post('/StopLeader',(req,res)=> {
+    exe
 })
 
 server.listen(port, () => {

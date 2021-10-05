@@ -1,9 +1,15 @@
-
 const express = require('express')
 const cors = require('cors');
 const fs = require('fs');
 const exec = require("child-process-async").exec;
 const app = express()
+const http = require('http');
+const server = http.createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+  },
+});
 const port = 2000
 const config = {
     application: {
@@ -30,6 +36,10 @@ var ip_host_id = 200
 var id = 0;
 var ip_leader = '192.168.1.38'
 var lastPriority = 10
+
+io.on('connection', (socket) => {
+    
+});
 
 function generateInstanceNetwork() {
     let ip = "192.168.1.";
@@ -101,8 +111,9 @@ app.post('/newLeader', (req, res) => {
     var divisiones = ipIn.split(":", 4);
     ipIn=divisiones[3]
     ip_leader=ipIn
+    io.emit('info', "El nuevo lider es :" + ip_leader )
   })
 
-app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
-})
+  server.listen(port, () => {
+    console.log('listening on *:2000');
+  });
